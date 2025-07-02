@@ -1,17 +1,22 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Building2, Search, Filter, Users, MapPin } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Building2, Search, Filter, Users, MapPin, Edit } from "lucide-react";
 
 const RoomGrid = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterType, setFilterType] = useState("all");
   const [filterBranch, setFilterBranch] = useState("all");
   const [searchRoom, setSearchRoom] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const branches = [
     { id: "anna-salai", name: "Anna Salai", color: "bg-blue-500" },
@@ -52,7 +57,7 @@ const RoomGrid = () => {
     return rooms;
   };
 
-  const [rooms] = useState(generateRooms());
+  const [rooms, setRooms] = useState(generateRooms());
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -61,6 +66,28 @@ const RoomGrid = () => {
       case "reserved": return "bg-yellow-500";
       case "dirty": return "bg-orange-500";
       default: return "bg-gray-500";
+    }
+  };
+
+  const getStatusDisplayName = (status) => {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
+  const handleRoomClick = (room) => {
+    setSelectedRoom(room);
+    setNewStatus(room.status);
+    setIsDialogOpen(true);
+  };
+
+  const handleStatusChange = () => {
+    if (selectedRoom && newStatus) {
+      setRooms(rooms.map(room => 
+        room.number === selectedRoom.number 
+          ? { ...room, status: newStatus }
+          : room
+      ));
+      setIsDialogOpen(false);
+      setSelectedRoom(null);
     }
   };
 
@@ -244,7 +271,7 @@ const RoomGrid = () => {
         </CardContent>
       </Card>
 
-      {/* Room Grid */}
+      {/* Room Grid with Status Change Dialog */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -255,36 +282,116 @@ const RoomGrid = () => {
                 {branches.find(b => b.id === filterBranch)?.name}
               </Badge>
             )}
+            <Badge variant="outline" className="ml-2 text-xs">
+              Click room to change status
+            </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-3">
             {filteredRooms.map((room) => (
-              <div
-                key={room.number}
-                className="relative group cursor-pointer transition-all hover:scale-105"
-              >
-                <div className={`
-                  w-full aspect-square rounded-lg p-2 text-white text-center flex flex-col justify-center
-                  ${getStatusColor(room.status)} shadow-sm hover:shadow-md transition-shadow
-                  border-2 border-transparent hover:border-white
-                `}>
-                  <div className="text-sm font-bold">{room.number}</div>
-                  <div className="text-xs opacity-90">{room.type}</div>
-                  <div className={`w-2 h-2 rounded-full mx-auto mt-1 ${room.branchColor}`}></div>
-                </div>
-                
-                {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap">
-                  <div className="font-medium">Room {room.number}</div>
-                  <div>{room.branchName}</div>
-                  <div>{room.type} - {room.status}</div>
-                  {room.guest && <div>Guest: {room.guest}</div>}
-                  {room.checkIn && <div>Check-in: {room.checkIn}</div>}
-                  <div>Rate: ₹{room.rate}/night</div>
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                </div>
-              </div>
+              <Dialog key={room.number} open={isDialogOpen && selectedRoom?.number === room.number} onOpenChange={(open) => {
+                if (!open) {
+                  setIsDialogOpen(false);
+                  setSelectedRoom(null);
+                }
+              }}>
+                <DialogTrigger asChild>
+                  <div
+                    className="relative group cursor-pointer transition-all hover:scale-105"
+                    onClick={() => handleRoomClick(room)}
+                  >
+                    <div className={`
+                      w-full aspect-square rounded-lg p-2 text-white text-center flex flex-col justify-center
+                      ${getStatusColor(room.status)} shadow-sm hover:shadow-md transition-shadow
+                      border-2 border-transparent hover:border-white
+                    `}>
+                      <div className="text-sm font-bold">{room.number}</div>
+                      <div className="text-xs opacity-90">{room.type}</div>
+                      <div className={`w-2 h-2 rounded-full mx-auto mt-1 ${room.branchColor}`}></div>
+                      <Edit className="h-3 w-3 mx-auto mt-1 opacity-60" />
+                    </div>
+                    
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap">
+                      <div className="font-medium">Room {room.number}</div>
+                      <div>{room.branchName}</div>
+                      <div>{room.type} - {getStatusDisplayName(room.status)}</div>
+                      {room.guest && <div>Guest: {room.guest}</div>}
+                      {room.checkIn && <div>Check-in: {room.checkIn}</div>}
+                      <div>Rate: ₹{room.rate}/night</div>
+                      <div className="text-xs opacity-75 mt-1">Click to change status</div>
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                    </div>
+                  </div>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Change Room {selectedRoom?.number} Status</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600">
+                        Branch: {selectedRoom?.branchName} | Type: {selectedRoom?.type}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Current Status: <span className="font-medium">{getStatusDisplayName(selectedRoom?.status || "")}</span>
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Select New Status:</Label>
+                      <RadioGroup value={newStatus} onValueChange={setNewStatus}>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="available" id="available" />
+                          <Label htmlFor="available" className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-green-500 rounded"></div>
+                            Available
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="occupied" id="occupied" />
+                          <Label htmlFor="occupied" className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-red-500 rounded"></div>
+                            Occupied
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="reserved" id="reserved" />
+                          <Label htmlFor="reserved" className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-yellow-500 rounded"></div>
+                            Reserved
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="dirty" id="dirty" />
+                          <Label htmlFor="dirty" className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-orange-500 rounded"></div>
+                            Dirty
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                    
+                    <div className="flex gap-2 pt-4">
+                      <Button 
+                        onClick={handleStatusChange}
+                        disabled={!newStatus || newStatus === selectedRoom?.status}
+                        className="flex-1"
+                      >
+                        Update Status
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsDialogOpen(false)}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             ))}
           </div>
         </CardContent>
