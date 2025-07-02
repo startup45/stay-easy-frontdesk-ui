@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,7 +50,10 @@ const CheckOutForm = () => {
 
   const handlePrintInvoice = () => {
     // Check if branch allows GST billing - this would come from app state/context
-    const branch: "CHK" | "SOU" = "CHK"; // This would come from app state
+    // Simulating dynamic branch selection (in real app, this would come from context/state)
+    const branches: ("CHK" | "SOU")[] = ["CHK", "SOU"];
+    const branch = branches[0]; // This would come from app state
+    
     if (branch === "SOU") {
       toast({
         title: "Invoice Printing Blocked",
