@@ -50,8 +50,8 @@ const CheckOutForm = () => {
   };
 
   const handlePrintInvoice = () => {
-    // Check if branch allows GST billing
-    const branch = "CHK"; // This would come from app state
+    // Check if branch allows GST billing - this would come from app state/context
+    const branch: "CHK" | "SOU" = "CHK"; // This would come from app state
     if (branch === "SOU") {
       toast({
         title: "Invoice Printing Blocked",
