@@ -3,21 +3,32 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Building2, CreditCard, Calendar, TrendingUp, Clock } from "lucide-react";
+import { Users, Building2, CreditCard, Calendar, TrendingUp, Clock, MapPin } from "lucide-react";
 
 const DashboardStats = () => {
+  const branches = [
+    { name: "Anna Salai", rooms: 37, occupied: 15, available: 22, color: "bg-blue-500" },
+    { name: "Erode Road", rooms: 37, occupied: 12, available: 25, color: "bg-green-500" },
+    { name: "Coimbatore Road", rooms: 37, occupied: 18, available: 19, color: "bg-purple-500" },
+    { name: "Bhavani Road", rooms: 36, occupied: 13, available: 23, color: "bg-orange-500" }
+  ];
+
+  const totalRooms = branches.reduce((sum, branch) => sum + branch.rooms, 0);
+  const totalOccupied = branches.reduce((sum, branch) => sum + branch.occupied, 0);
+  const totalAvailable = branches.reduce((sum, branch) => sum + branch.available, 0);
+
   const stats = [
     {
       title: "Total Rooms",
-      value: "147",
-      change: "Available: 89",
+      value: totalRooms.toString(),
+      change: `Available: ${totalAvailable}`,
       icon: Building2,
       color: "text-blue-600",
       bgColor: "bg-blue-50"
     },
     {
       title: "Current Guests",
-      value: "58",
+      value: totalOccupied.toString(),
       change: "Check-ins today: 12",
       icon: Users,
       color: "text-green-600",
@@ -42,10 +53,10 @@ const DashboardStats = () => {
   ];
 
   const recentActivities = [
-    { id: 1, action: "Check-in", guest: "Rajesh Kumar", room: "101", time: "2 mins ago" },
-    { id: 2, action: "Check-out", guest: "Priya Sharma", room: "205", time: "15 mins ago" },
-    { id: 3, action: "Payment", guest: "Milk Mist Company", amount: "₹8,500", time: "1 hour ago" },
-    { id: 4, action: "Room Clean", room: "304", status: "Ready", time: "2 hours ago" }
+    { id: 1, action: "Check-in", guest: "Rajesh Kumar", room: "101", branch: "Anna Salai", time: "2 mins ago" },
+    { id: 2, action: "Check-out", guest: "Priya Sharma", room: "205", branch: "Erode Road", time: "15 mins ago" },
+    { id: 3, action: "Payment", guest: "Milk Mist Company", amount: "₹8,500", branch: "Coimbatore Road", time: "1 hour ago" },
+    { id: 4, action: "Room Clean", room: "304", branch: "Bhavani Road", status: "Ready", time: "2 hours ago" }
   ];
 
   return (
@@ -72,6 +83,51 @@ const DashboardStats = () => {
           );
         })}
       </div>
+
+      {/* Branch Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Branch Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {branches.map((branch, index) => (
+              <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className={`w-3 h-3 rounded-full ${branch.color}`}></div>
+                  <h3 className="font-semibold text-sm">{branch.name}</h3>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Rooms:</span>
+                    <span className="font-medium">{branch.rooms}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-600">Available:</span>
+                    <span className="font-medium text-green-600">{branch.available}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-red-600">Occupied:</span>
+                    <span className="font-medium text-red-600">{branch.occupied}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div 
+                      className="bg-red-500 h-2 rounded-full" 
+                      style={{ width: `${(branch.occupied / branch.rooms) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-gray-500 text-center">
+                    {Math.round((branch.occupied / branch.rooms) * 100)}% Occupancy
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Quick Actions & Recent Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -127,7 +183,7 @@ const DashboardStats = () => {
                         {activity.guest || `Room ${activity.room}`}
                       </p>
                       <p className="text-xs text-gray-600">
-                        {activity.room && `Room ${activity.room}`}
+                        {activity.branch} • {activity.room && `Room ${activity.room}`}
                         {activity.amount && activity.amount}
                         {activity.status && activity.status}
                       </p>
@@ -147,17 +203,17 @@ const DashboardStats = () => {
       {/* Room Status Summary */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Room Status Overview</CardTitle>
+          <CardTitle className="text-lg font-semibold">Overall Room Status</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">89</div>
+              <div className="text-2xl font-bold text-green-600">{totalAvailable}</div>
               <div className="text-sm text-green-700 font-medium">Available</div>
               <div className="w-4 h-4 bg-green-500 rounded-full mx-auto mt-2"></div>
             </div>
             <div className="text-center p-4 bg-red-50 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">58</div>
+              <div className="text-2xl font-bold text-red-600">{totalOccupied}</div>
               <div className="text-sm text-red-700 font-medium">Occupied</div>
               <div className="w-4 h-4 bg-red-500 rounded-full mx-auto mt-2"></div>
             </div>

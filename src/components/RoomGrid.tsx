@@ -5,24 +5,33 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Building2, Search, Filter, Users } from "lucide-react";
+import { Building2, Search, Filter, Users, MapPin } from "lucide-react";
 
 const RoomGrid = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterType, setFilterType] = useState("all");
+  const [filterBranch, setFilterBranch] = useState("all");
   const [searchRoom, setSearchRoom] = useState("");
 
-  // Generate 147 rooms with mock data
+  const branches = [
+    { id: "anna-salai", name: "Anna Salai", color: "bg-blue-500" },
+    { id: "erode-road", name: "Erode Road", color: "bg-green-500" },
+    { id: "coimbatore-road", name: "Coimbatore Road", color: "bg-purple-500" },
+    { id: "bhavani-road", name: "Bhavani Road", color: "bg-orange-500" }
+  ];
+
+  // Generate rooms for each branch
   const generateRooms = () => {
     const rooms = [];
     const statuses = ["available", "occupied", "reserved", "dirty"];
     const types = ["Standard", "Deluxe", "Suite"];
     
-    for (let floor = 1; floor <= 3; floor++) {
-      for (let room = 1; room <= 49; room++) {
-        if (rooms.length >= 147) break;
-        
-        const roomNum = floor * 100 + room;
+    branches.forEach((branch, branchIndex) => {
+      // Generate 36-37 rooms per branch to total 147
+      const roomsPerBranch = branchIndex < 3 ? 37 : 36;
+      
+      for (let room = 1; room <= roomsPerBranch; room++) {
+        const roomNum = (branchIndex + 1) * 100 + room;
         const status = statuses[Math.floor(Math.random() * statuses.length)];
         const type = types[Math.floor(Math.random() * types.length)];
         
@@ -30,13 +39,17 @@ const RoomGrid = () => {
           number: roomNum,
           status,
           type,
+          branch: branch.id,
+          branchName: branch.name,
+          branchColor: branch.color,
           guest: status === "occupied" ? `Guest ${room}` : null,
           checkIn: status === "occupied" ? "2024-07-01" : null,
           rate: type === "Suite" ? 5000 : type === "Deluxe" ? 3000 : 2000
         });
       }
-    }
-    return rooms.slice(0, 147);
+    });
+    
+    return rooms;
   };
 
   const [rooms] = useState(generateRooms());
@@ -51,34 +64,69 @@ const RoomGrid = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
-    const colors = {
-      available: "bg-green-100 text-green-800 border-green-200",
-      occupied: "bg-red-100 text-red-800 border-red-200",
-      reserved: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      dirty: "bg-orange-100 text-orange-800 border-orange-200"
-    };
-    
-    return colors[status] || "bg-gray-100 text-gray-800";
-  };
-
   const filteredRooms = rooms.filter(room => {
     const matchesStatus = filterStatus === "all" || room.status === filterStatus;
     const matchesType = filterType === "all" || room.type === filterType;
+    const matchesBranch = filterBranch === "all" || room.branch === filterBranch;
     const matchesSearch = searchRoom === "" || room.number.toString().includes(searchRoom);
     
-    return matchesStatus && matchesType && matchesSearch;
+    return matchesStatus && matchesType && matchesBranch && matchesSearch;
   });
 
+  const getStatsByBranch = (branchId) => {
+    const branchRooms = rooms.filter(r => r.branch === branchId);
+    return {
+      total: branchRooms.length,
+      available: branchRooms.filter(r => r.status === "available").length,
+      occupied: branchRooms.filter(r => r.status === "occupied").length,
+      reserved: branchRooms.filter(r => r.status === "reserved").length,
+      dirty: branchRooms.filter(r => r.status === "dirty").length
+    };
+  };
+
   const statusCounts = {
-    available: rooms.filter(r => r.status === "available").length,
-    occupied: rooms.filter(r => r.status === "occupied").length,
-    reserved: rooms.filter(r => r.status === "reserved").length,
-    dirty: rooms.filter(r => r.status === "dirty").length
+    available: filteredRooms.filter(r => r.status === "available").length,
+    occupied: filteredRooms.filter(r => r.status === "occupied").length,
+    reserved: filteredRooms.filter(r => r.status === "reserved").length,
+    dirty: filteredRooms.filter(r => r.status === "dirty").length
   };
 
   return (
     <div className="space-y-6">
+      {/* Branch Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {branches.map((branch) => {
+          const stats = getStatsByBranch(branch.id);
+          return (
+            <Card key={branch.id} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${branch.color}`}></div>
+                    <h3 className="font-semibold text-sm">{branch.name}</h3>
+                  </div>
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                </div>
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between">
+                    <span>Total:</span>
+                    <span className="font-medium">{stats.total}</span>
+                  </div>
+                  <div className="flex justify-between text-green-600">
+                    <span>Available:</span>
+                    <span className="font-medium">{stats.available}</span>
+                  </div>
+                  <div className="flex justify-between text-red-600">
+                    <span>Occupied:</span>
+                    <span className="font-medium">{stats.occupied}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
       {/* Header Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-green-50 border-green-200">
@@ -120,7 +168,7 @@ const RoomGrid = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Search Room</label>
               <div className="relative">
@@ -132,6 +180,22 @@ const RoomGrid = () => {
                   className="pl-10"
                 />
               </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Branch</label>
+              <Select value={filterBranch} onValueChange={setFilterBranch}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Branches</SelectItem>
+                  {branches.map(branch => (
+                    <SelectItem key={branch.id} value={branch.id}>
+                      {branch.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Status</label>
@@ -168,6 +232,7 @@ const RoomGrid = () => {
                 onClick={() => {
                   setFilterStatus("all");
                   setFilterType("all");
+                  setFilterBranch("all");
                   setSearchRoom("");
                 }}
                 className="w-full"
@@ -185,6 +250,11 @@ const RoomGrid = () => {
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             <Building2 className="h-5 w-5" />
             Room Status Grid ({filteredRooms.length} rooms)
+            {filterBranch !== "all" && (
+              <Badge variant="outline" className="ml-2">
+                {branches.find(b => b.id === filterBranch)?.name}
+              </Badge>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -197,14 +267,17 @@ const RoomGrid = () => {
                 <div className={`
                   w-full aspect-square rounded-lg p-2 text-white text-center flex flex-col justify-center
                   ${getStatusColor(room.status)} shadow-sm hover:shadow-md transition-shadow
+                  border-2 border-transparent hover:border-white
                 `}>
                   <div className="text-sm font-bold">{room.number}</div>
                   <div className="text-xs opacity-90">{room.type}</div>
+                  <div className={`w-2 h-2 rounded-full mx-auto mt-1 ${room.branchColor}`}></div>
                 </div>
                 
                 {/* Tooltip */}
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap">
                   <div className="font-medium">Room {room.number}</div>
+                  <div>{room.branchName}</div>
                   <div>{room.type} - {room.status}</div>
                   {room.guest && <div>Guest: {room.guest}</div>}
                   {room.checkIn && <div>Check-in: {room.checkIn}</div>}
@@ -218,31 +291,49 @@ const RoomGrid = () => {
       </Card>
 
       {/* Legend */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-medium">Status Legend</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-sm">Available</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-medium">Status Legend</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-500 rounded"></div>
+                <span className="text-sm">Available</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-500 rounded"></div>
+                <span className="text-sm">Occupied</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+                <span className="text-sm">Reserved</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-orange-500 rounded"></div>
+                <span className="text-sm">Dirty</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-500 rounded"></div>
-              <span className="text-sm">Occupied</span>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-medium">Branch Legend</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              {branches.map(branch => (
+                <div key={branch.id} className="flex items-center gap-2">
+                  <div className={`w-4 h-4 rounded-full ${branch.color}`}></div>
+                  <span className="text-sm">{branch.name}</span>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-              <span className="text-sm">Reserved</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-orange-500 rounded"></div>
-              <span className="text-sm">Dirty</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
