@@ -92,35 +92,35 @@ const Index = ({ user, onLogout }: IndexProps) => {
   const visibleNavItems = navigationItems.filter(item => visibleTabs.includes(item.id));
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top Bar */}
-      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-background">
+      {/* Top Bar - Front Office Optimized */}
+      <div className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="lg:hidden"
+              className="lg:hidden fo-button"
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-white" />
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
+                <Building2 className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">HotelOS</h1>
-                <p className="text-sm text-gray-500 leading-none">
+                <h1 className="fo-text-xl text-foreground">HotelOS</h1>
+                <p className="fo-text-base text-muted-foreground">
                   {currentBranch?.name} {!isGSTBranch && "(Non-GST)"}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Top Bar Navigation */}
-          <div className="hidden lg:flex items-center space-x-2">
-            {visibleNavItems.slice(0, 6).map((item) => {
+          {/* Top Bar Navigation - Larger for Front Office */}
+          <div className="hidden lg:flex items-center space-x-3">
+            {visibleNavItems.slice(0, 5).map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               
@@ -128,14 +128,10 @@ const Index = ({ user, onLogout }: IndexProps) => {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                  className={`fo-nav-item ${isActive ? 'active' : ''}`}
                 >
-                  <Icon className={`h-4 w-4 ${isActive ? 'text-blue-600' : item.color} transition-colors`} />
-                  <span>{item.label}</span>
+                  <Icon className="h-5 w-5" />
+                  <span className="hidden xl:inline">{item.label}</span>
                 </button>
               );
             })}
@@ -143,32 +139,31 @@ const Index = ({ user, onLogout }: IndexProps) => {
 
           <div className="flex items-center space-x-4">
             <div className="hidden md:flex items-center space-x-3">
-              <Badge className={`${getRoleColor(user.role)} font-medium px-3 py-1`}>
+              <Badge className={`${getRoleColor(user.role)} fo-text-base font-semibold px-4 py-2`}>
                 {user.role.toUpperCase()}
               </Badge>
-              <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-300 font-medium px-3 py-1">
-                <Globe className="h-3 w-3 mr-2" />
+              <Badge variant="outline" className="bg-accent text-accent-foreground border-border fo-text-base font-medium px-4 py-2">
+                <Globe className="h-4 w-4 mr-2" />
                 {user.language === "ta" ? "தமிழ்" : user.language === "hi" ? "हिंदी" : "English"}
               </Badge>
             </div>
             <Button
               variant="ghost"
-              size="sm"
               onClick={onLogout}
-              className="text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors"
+              className="fo-button-outline text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Logout</span>
+              <LogOut className="h-5 w-5 mr-2" />
+              <span className="hidden sm:inline fo-text-base">Logout</span>
             </Button>
           </div>
         </div>
       </div>
 
       <div className="flex">
-        {/* Sidebar */}
-        <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 bg-white border-r border-gray-200 shadow-sm h-[calc(100vh-73px)] overflow-y-auto lg:hidden`}>
-          <div className="p-4">
-            <nav className="space-y-2">
+        {/* Mobile Sidebar - Front Office Optimized */}
+        <div className={`${sidebarCollapsed ? 'w-20' : 'w-80'} transition-all duration-300 bg-card border-r border-border shadow-lg h-[calc(100vh-81px)] overflow-y-auto lg:hidden animate-slide-in`}>
+          <div className="p-6">
+            <nav className="space-y-3">
               {visibleNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -177,15 +172,11 @@ const Index = ({ user, onLogout }: IndexProps) => {
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
+                    className={`w-full fo-nav-item justify-start ${isActive ? 'active' : ''}`}
                   >
-                    <Icon className={`h-5 w-5 ${isActive ? 'text-blue-600' : item.color} transition-colors`} />
+                    <Icon className="h-6 w-6 flex-shrink-0" />
                     {!sidebarCollapsed && (
-                      <span className="transition-opacity duration-200">{item.label}</span>
+                      <span className="transition-opacity duration-200 fo-text-lg">{item.label}</span>
                     )}
                   </button>
                 );
@@ -194,93 +185,113 @@ const Index = ({ user, onLogout }: IndexProps) => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 overflow-auto">
-          <div className="p-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Main Content - Front Office Optimized */}
+        <div className="flex-1 overflow-auto bg-accent/30">
+          <div className="p-8">
+            <div className="fo-card overflow-hidden animate-fade-in">
+              {/* Active Tab Header */}
+              <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-6">
+                <div className="flex items-center gap-3">
+                  {(() => {
+                    const currentItem = visibleNavItems.find(item => item.id === activeTab);
+                    const Icon = currentItem?.icon || Home;
+                    return (
+                      <>
+                        <Icon className="h-7 w-7" />
+                        <h2 className="fo-text-xl font-semibold">{currentItem?.label || 'Dashboard'}</h2>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
               {/* Tab Contents */}
-              {activeTab === "dashboard" && (
-                <div className="p-6">
-                  <DashboardStats />
-                </div>
-              )}
+              <div className="bg-card">
+                {activeTab === "dashboard" && (
+                  <div className="p-8">
+                    <DashboardStats />
+                  </div>
+                )}
 
-              {activeTab === "checkin" && (
-                <div className="p-6 space-y-6">
-                  <CheckInForm />
-                  <IdProofUpload />
-                </div>
-              )}
+                {activeTab === "checkin" && (
+                  <div className="p-8 space-y-8">
+                    <div className="grid gap-8 lg:grid-cols-1">
+                      <CheckInForm />
+                      <IdProofUpload />
+                    </div>
+                  </div>
+                )}
 
-              {activeTab === "checkout" && (
-                <div className="p-6">
-                  <CheckOutForm />
-                </div>
-              )}
+                {activeTab === "checkout" && (
+                  <div className="p-8">
+                    <CheckOutForm />
+                  </div>
+                )}
 
-              {activeTab === "rooms" && (
-                <div className="p-6">
-                  <RoomGrid />
-                </div>
-              )}
+                {activeTab === "rooms" && (
+                  <div className="p-8">
+                    <RoomGrid />
+                  </div>
+                )}
 
-              {activeTab === "live-rooms" && (
-                <div className="p-6">
-                  <LiveRoomGrid userRole={user.role} branch={user.branch} />
-                </div>
-              )}
+                {activeTab === "live-rooms" && (
+                  <div className="p-8">
+                    <LiveRoomGrid userRole={user.role} branch={user.branch} />
+                  </div>
+                )}
 
-              {activeTab === "room-mgmt" && (
-                <div className="p-6">
-                  <RoomManagement />
-                </div>
-              )}
+                {activeTab === "room-mgmt" && (
+                  <div className="p-8">
+                    <RoomManagement />
+                  </div>
+                )}
 
-              {activeTab === "payments" && (
-                <div className="p-6">
-                  <PaymentSystem />
-                </div>
-              )}
+                {activeTab === "payments" && (
+                  <div className="p-8">
+                    <PaymentSystem />
+                  </div>
+                )}
 
-              {activeTab === "guests" && (
-                <div className="p-6">
-                  <GuestHistory />
-                </div>
-              )}
+                {activeTab === "guests" && (
+                  <div className="p-8">
+                    <GuestHistory />
+                  </div>
+                )}
 
-              {activeTab === "reports" && (
-                <div className="p-6">
-                  <ReportsAnalytics />
-                </div>
-              )}
+                {activeTab === "reports" && (
+                  <div className="p-8">
+                    <ReportsAnalytics />
+                  </div>
+                )}
 
-              {activeTab === "search" && (
-                <div className="p-6">
-                  <AdvancedSearch />
-                </div>
-              )}
+                {activeTab === "search" && (
+                  <div className="p-8">
+                    <AdvancedSearch />
+                  </div>
+                )}
 
-              {activeTab === "export" && (
-                <div className="p-6">
-                  <DataExport />
-                </div>
-              )}
+                {activeTab === "export" && (
+                  <div className="p-8">
+                    <DataExport />
+                  </div>
+                )}
 
-              {activeTab === "billing" && (
-                <div className="p-6">
-                  <SmartBilling 
-                    userRole={user.role} 
-                    branch={user.branch} 
-                    isGSTBranch={isGSTBranch} 
-                  />
-                </div>
-              )}
+                {activeTab === "billing" && (
+                  <div className="p-8">
+                    <SmartBilling 
+                      userRole={user.role} 
+                      branch={user.branch} 
+                      isGSTBranch={isGSTBranch} 
+                    />
+                  </div>
+                )}
 
-              {activeTab === "audit" && (
-                <div className="p-6">
-                  <AuditLog userRole={user.role} />
-                </div>
-              )}
+                {activeTab === "audit" && (
+                  <div className="p-8">
+                    <AuditLog userRole={user.role} />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

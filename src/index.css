@@ -116,6 +116,24 @@ All colors MUST be HSL.
     letter-spacing: -0.025em;
   }
 
+  /* Front office optimized typography */
+  .fo-text-base {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .fo-text-lg {
+    font-size: 18px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .fo-text-xl {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
@@ -161,5 +179,85 @@ All colors MUST be HSL.
 
   .modern-shadow-lg {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Front office UI components */
+  .fo-button {
+    @apply min-h-[44px] px-6 py-3 text-base font-medium rounded-lg transition-all duration-200;
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+    @apply focus:ring-2 focus:ring-primary/20 focus:outline-none;
+    @apply active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .fo-button-secondary {
+    @apply fo-button bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+
+  .fo-button-outline {
+    @apply fo-button bg-background text-foreground border-2 border-border;
+    @apply hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .fo-input {
+    @apply min-h-[44px] px-4 py-3 text-base border border-input rounded-lg;
+    @apply bg-background text-foreground placeholder:text-muted-foreground;
+    @apply focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none;
+    @apply transition-all duration-200;
+  }
+
+  .fo-card {
+    @apply bg-card text-card-foreground rounded-xl border border-border;
+    @apply shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  .fo-nav-item {
+    @apply flex items-center gap-3 px-4 py-3 text-base font-medium rounded-lg;
+    @apply text-foreground/80 hover:text-foreground hover:bg-accent;
+    @apply transition-all duration-200 cursor-pointer;
+  }
+
+  .fo-nav-item.active {
+    @apply text-primary bg-primary/10 border border-primary/20;
+  }
+
+  .fo-status-badge {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-full;
+    @apply border transition-colors duration-200;
+  }
+
+  .fo-room-card {
+    @apply fo-card p-4 cursor-pointer hover:shadow-lg transition-all duration-200;
+    @apply hover:scale-102 active:scale-100;
+  }
+
+  /* Animations */
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-in {
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
   }
 }
