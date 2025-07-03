@@ -16,10 +16,62 @@ import ReportsAnalytics from "@/components/ReportsAnalytics";
 import NotificationCenter from "@/components/NotificationCenter";
 import AdvancedSearch from "@/components/AdvancedSearch";
 import DataExport from "@/components/DataExport";
-import { Users, Calendar, Building2, CreditCard, TrendingUp, Search, Bell, Download, History, Settings } from "lucide-react";
+import LiveRoomGrid from "@/components/LiveRoomGrid";
+import SmartBilling from "@/components/SmartBilling";
+import AuditLog from "@/components/AuditLog";
+import IdProofUpload from "@/components/IdProofUpload";
+import { Users, Calendar, Building2, CreditCard, TrendingUp, Search, Bell, Download, History, Settings, LogOut, Globe, Shield } from "lucide-react";
 
-const Index = () => {
+interface IndexProps {
+  user: {
+    role: string;
+    branch: string;
+    language: string;
+  };
+  onLogout: () => void;
+}
+
+const Index = ({ user, onLogout }: IndexProps) => {
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  const branches = [
+    { id: "anna-salai", name: "Anna Salai", gst: true },
+    { id: "erode-road", name: "Erode Road", gst: true },
+    { id: "coimbatore-road", name: "Coimbatore Road", gst: true },
+    { id: "bhavani-road", name: "Bhavani Road", gst: false }
+  ];
+
+  const currentBranch = branches.find(b => b.id === user.branch);
+  const isGSTBranch = currentBranch?.gst ?? true;
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "admin": return "bg-red-100 text-red-800";
+      case "bmo": return "bg-blue-100 text-blue-800";
+      case "fmo": return "bg-green-100 text-green-800";
+      case "front-office": return "bg-yellow-100 text-yellow-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getVisibleTabs = () => {
+    const baseTabs = ["dashboard", "checkin", "checkout", "rooms", "live-rooms"];
+    
+    switch (user.role) {
+      case "admin":
+        return [...baseTabs, "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "audit"];
+      case "bmo":
+        return [...baseTabs, "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "audit"];
+      case "fmo":
+        return [...baseTabs, "room-mgmt", "payments", "guests", "reports", "search", "billing"];
+      case "front-office":
+        return [...baseTabs, "guests", "search", "billing"];
+      default:
+        return baseTabs;
+    }
+  };
+
+  const visibleTabs = getVisibleTabs();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
@@ -28,17 +80,28 @@ const Index = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Hotel Front Office</h1>
-              <p className="text-sm text-gray-600">Management System</p>
+              <h1 className="text-2xl font-bold text-gray-900">Hotel Management System</h1>
+              <p className="text-sm text-gray-600">
+                {currentBranch?.name} Branch {!isGSTBranch && "(Non-GST)"}
+              </p>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                Online
+              <Badge className={getRoleColor(user.role)}>
+                {user.role.toUpperCase()}
               </Badge>
-              <div className="text-right">
-                <p className="font-medium text-gray-900">Front Desk</p>
-                <p className="text-sm text-gray-600">CHK Branch</p>
-              </div>
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                <Globe className="h-3 w-3 mr-1" />
+                {user.language === "ta" ? "தமிழ்" : user.language === "hi" ? "हिंदी" : "English"}
+              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onLogout}
+                className="text-red-600 hover:text-red-700"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>
@@ -58,46 +121,84 @@ const Index = () => {
               {/* Navigation Tabs */}
               <div className="overflow-x-auto">
                 <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10 bg-white shadow-sm">
-                  <TabsTrigger value="dashboard" className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Dashboard</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="checkin" className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <span className="hidden sm:inline">Check-In</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="checkout" className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span className="hidden sm:inline">Check-Out</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="rooms" className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Rooms</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="room-mgmt" className="flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    <span className="hidden sm:inline">Room Mgmt</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="payments" className="flex items-center gap-2">
-                    <CreditCard className="h-4 w-4" />
-                    <span className="hidden sm:inline">Payments</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="guests" className="flex items-center gap-2">
-                    <History className="h-4 w-4" />
-                    <span className="hidden sm:inline">Guests</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="reports" className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4" />
-                    <span className="hidden sm:inline">Reports</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="search" className="flex items-center gap-2">
-                    <Search className="h-4 w-4" />
-                    <span className="hidden sm:inline">Search</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="export" className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    <span className="hidden sm:inline">Export</span>
-                  </TabsTrigger>
+                  {visibleTabs.includes("dashboard") && (
+                    <TabsTrigger value="dashboard" className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      <span className="hidden sm:inline">Dashboard</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("checkin") && (
+                    <TabsTrigger value="checkin" className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <span className="hidden sm:inline">Check-In</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("checkout") && (
+                    <TabsTrigger value="checkout" className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      <span className="hidden sm:inline">Check-Out</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("rooms") && (
+                    <TabsTrigger value="rooms" className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      <span className="hidden sm:inline">Rooms</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("live-rooms") && (
+                    <TabsTrigger value="live-rooms" className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      <span className="hidden sm:inline">Live Grid</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("room-mgmt") && (
+                    <TabsTrigger value="room-mgmt" className="flex items-center gap-2">
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden sm:inline">Room Mgmt</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("payments") && (
+                    <TabsTrigger value="payments" className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      <span className="hidden sm:inline">Payments</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("guests") && (
+                    <TabsTrigger value="guests" className="flex items-center gap-2">
+                      <History className="h-4 w-4" />
+                      <span className="hidden sm:inline">Guests</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("reports") && (
+                    <TabsTrigger value="reports" className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      <span className="hidden sm:inline">Reports</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("search") && (
+                    <TabsTrigger value="search" className="flex items-center gap-2">
+                      <Search className="h-4 w-4" />
+                      <span className="hidden sm:inline">Search</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("export") && (
+                    <TabsTrigger value="export" className="flex items-center gap-2">
+                      <Download className="h-4 w-4" />
+                      <span className="hidden sm:inline">Export</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("billing") && (
+                    <TabsTrigger value="billing" className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      <span className="hidden sm:inline">Smart Bill</span>
+                    </TabsTrigger>
+                  )}
+                  {visibleTabs.includes("audit") && (
+                    <TabsTrigger value="audit" className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      <span className="hidden sm:inline">Audit</span>
+                    </TabsTrigger>
+                  )}
                 </TabsList>
               </div>
 
@@ -107,7 +208,10 @@ const Index = () => {
               </TabsContent>
 
               <TabsContent value="checkin">
-                <CheckInForm />
+                <div className="space-y-6">
+                  <CheckInForm />
+                  <IdProofUpload />
+                </div>
               </TabsContent>
 
               <TabsContent value="checkout">
@@ -116,6 +220,10 @@ const Index = () => {
 
               <TabsContent value="rooms">
                 <RoomGrid />
+              </TabsContent>
+
+              <TabsContent value="live-rooms">
+                <LiveRoomGrid userRole={user.role} branch={user.branch} />
               </TabsContent>
 
               <TabsContent value="room-mgmt">
@@ -140,6 +248,18 @@ const Index = () => {
 
               <TabsContent value="export">
                 <DataExport />
+              </TabsContent>
+
+              <TabsContent value="billing">
+                <SmartBilling 
+                  userRole={user.role} 
+                  branch={user.branch} 
+                  isGSTBranch={isGSTBranch} 
+                />
+              </TabsContent>
+
+              <TabsContent value="audit">
+                <AuditLog userRole={user.role} />
               </TabsContent>
 
               <TabsContent value="companies">
