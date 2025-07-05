@@ -97,7 +97,6 @@ const Index = ({ user, onLogout }: IndexProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Bar - Front Office Optimized */}
       <div className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-4">
@@ -122,7 +121,6 @@ const Index = ({ user, onLogout }: IndexProps) => {
             </div>
           </div>
 
-          {/* Top Bar Navigation - Larger for Front Office */}
           <div className="hidden lg:flex items-center space-x-3">
             {visibleNavItems.slice(0, 5).map((item) => {
               const Icon = item.icon;
@@ -164,7 +162,6 @@ const Index = ({ user, onLogout }: IndexProps) => {
       </div>
 
       <div className="flex">
-        {/* Mobile Sidebar - Front Office Optimized */}
         <div className={`${sidebarCollapsed ? 'w-20' : 'w-80'} transition-all duration-300 bg-card border-r border-border shadow-lg h-[calc(100vh-81px)] overflow-y-auto lg:hidden animate-slide-in`}>
           <div className="p-6">
             <nav className="space-y-3">
@@ -189,11 +186,9 @@ const Index = ({ user, onLogout }: IndexProps) => {
           </div>
         </div>
 
-        {/* Main Content - Front Office Optimized */}
         <div className="flex-1 overflow-auto bg-accent/30">
           <div className="p-8">
             <div className="fo-card overflow-hidden animate-fade-in">
-              {/* Active Tab Header */}
               <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-6">
                 <div className="flex items-center gap-3">
                   {(() => {
@@ -209,7 +204,6 @@ const Index = ({ user, onLogout }: IndexProps) => {
                 </div>
               </div>
 
-              {/* Tab Contents */}
               <div className="bg-card">
                 {activeTab === "dashboard" && (
                   <div className="p-8">
