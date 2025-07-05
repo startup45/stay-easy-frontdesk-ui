@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,9 @@ import LiveRoomGrid from "@/components/LiveRoomGrid";
 import SmartBilling from "@/components/SmartBilling";
 import AuditLog from "@/components/AuditLog";
 import IdProofUpload from "@/components/IdProofUpload";
+import GuestList from "@/components/GuestList";
+import EnhancedCheckOutForm from "@/components/EnhancedCheckOutForm";
+import CompanyBilling from "@/components/CompanyBilling";
 import { Users, Calendar, Building2, CreditCard, TrendingUp, Search, Bell, Download, History, Settings, LogOut, Globe, Shield, Menu, X, Home, UserCheck, UserX } from "lucide-react";
 
 interface IndexProps {
@@ -59,13 +61,13 @@ const Index = ({ user, onLogout }: IndexProps) => {
     
     switch (user.role) {
       case "admin":
-        return [...baseTabs, "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "audit"];
+        return [...baseTabs, "guest-list", "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "company-billing", "audit"];
       case "bmo":
-        return [...baseTabs, "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "audit"];
+        return [...baseTabs, "guest-list", "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "company-billing"];
       case "fmo":
-        return [...baseTabs, "room-mgmt", "payments", "guests", "reports", "search", "billing"];
+        return [...baseTabs, "guest-list", "room-mgmt", "payments", "guests", "reports", "search", "billing"];
       case "front-office":
-        return [...baseTabs, "guests", "search", "billing"];
+        return [...baseTabs, "guest-list", "guests", "search"];
       default:
         return baseTabs;
     }
@@ -77,6 +79,7 @@ const Index = ({ user, onLogout }: IndexProps) => {
     { id: "dashboard", label: "Dashboard", icon: Home, color: "text-blue-600" },
     { id: "checkin", label: "Check In", icon: UserCheck, color: "text-green-600" },
     { id: "checkout", label: "Check Out", icon: UserX, color: "text-orange-600" },
+    { id: "guest-list", label: "Guest List", icon: Users, color: "text-purple-600" },
     { id: "rooms", label: "Rooms", icon: Building2, color: "text-purple-600" },
     { id: "live-rooms", label: "Live Grid", icon: Building2, color: "text-teal-600" },
     { id: "room-mgmt", label: "Room Management", icon: Settings, color: "text-indigo-600" },
@@ -86,6 +89,7 @@ const Index = ({ user, onLogout }: IndexProps) => {
     { id: "search", label: "Advanced Search", icon: Search, color: "text-violet-600" },
     { id: "export", label: "Data Export", icon: Download, color: "text-pink-600" },
     { id: "billing", label: "Smart Billing", icon: CreditCard, color: "text-yellow-600" },
+    { id: "company-billing", label: "Company Bills", icon: Building2, color: "text-blue-600" },
     { id: "audit", label: "Audit Log", icon: Shield, color: "text-red-600" }
   ];
 
@@ -224,7 +228,17 @@ const Index = ({ user, onLogout }: IndexProps) => {
 
                 {activeTab === "checkout" && (
                   <div className="p-8">
-                    <CheckOutForm />
+                    <EnhancedCheckOutForm 
+                      userRole={user.role} 
+                      branch={user.branch} 
+                      isGSTBranch={isGSTBranch} 
+                    />
+                  </div>
+                )}
+
+                {activeTab === "guest-list" && (
+                  <div className="p-8">
+                    <GuestList userRole={user.role} />
                   </div>
                 )}
 
@@ -281,6 +295,15 @@ const Index = ({ user, onLogout }: IndexProps) => {
                     <SmartBilling 
                       userRole={user.role} 
                       branch={user.branch} 
+                      isGSTBranch={isGSTBranch} 
+                    />
+                  </div>
+                )}
+
+                {activeTab === "company-billing" && (user.role === "admin" || user.role === "bmo") && (
+                  <div className="p-8">
+                    <CompanyBilling 
+                      userRole={user.role} 
                       isGSTBranch={isGSTBranch} 
                     />
                   </div>
