@@ -26,7 +26,7 @@ const CheckInForm = () => {
   });
 
   const availableRooms = [101, 102, 103, 201, 202, 203, 301, 302, 303];
-  const companies = ["Milk Mist", "Tech Corp", "Hospitality Group", "Travel Associates"];
+  const companies = ["Walk-in", "Milk Mist", "Tech Corp", "Hospitality Group", "Travel Associates"];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,34 +37,60 @@ const CheckInForm = () => {
   };
 
   return (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-t-lg">
-        <CardTitle className="text-xl font-semibold flex items-center gap-2">
-          <User className="h-5 w-5" />
-          Guest Check-In Form
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Guest Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <Card>
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-t-lg">
+          <CardTitle className="text-xl font-semibold flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Guest Check-In Form
+          </CardTitle>
+        </CardHeader>
+      </Card>
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Step 1: Guest Details */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-primary">
+              Step 1: Guest Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="guestName" className="text-sm font-medium">Guest Name *</Label>
               <Input id="guestName" placeholder="Enter guest full name" className="h-10" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phoneNumber" className="text-sm font-medium">Phone Number *</Label>
-              <Input id="phoneNumber" placeholder="+91 9876543210" className="h-10" required />
+              <Input 
+                id="phoneNumber" 
+                placeholder="+91 9876543210" 
+                className="h-10" 
+                type="tel"
+                pattern="[+][0-9]{2}[0-9]{10}"
+                required 
+              />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="address" className="text-sm font-medium">Address *</Label>
-            <Textarea id="address" placeholder="Enter complete address" className="min-h-20" required />
-          </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="address" className="text-sm font-medium">Address *</Label>
+              <Textarea id="address" placeholder="Enter complete address" className="min-h-20" required />
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Arrival Details */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Step 2: Room & Arrival Details */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-primary">
+              Step 2: Room & Arrival Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label className="text-sm font-medium">Date of Arrival</Label>
               <Popover>
@@ -120,10 +146,19 @@ const CheckInForm = () => {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* ID Proof Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Step 3: ID Proof Details */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-primary">
+              Step 3: ID Proof Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="idProofType" className="text-sm font-medium">ID Proof Type *</Label>
               <Select>
@@ -142,10 +177,19 @@ const CheckInForm = () => {
               <Label htmlFor="idProofNumber" className="text-sm font-medium">ID Proof Number *</Label>
               <Input id="idProofNumber" placeholder="Enter ID number" className="h-10" required />
             </div>
-          </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Guest Type */}
-          <div className="space-y-3">
+        {/* Step 4: Guest Type & Company */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-primary">
+              Step 4: Guest Type & Company Assignment
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
             <Label className="text-sm font-medium">Guest Type *</Label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="flex items-center space-x-2">
@@ -183,93 +227,87 @@ const CheckInForm = () => {
             </div>
           </div>
 
-          {/* Company Assignment */}
-          {guestTypes.companyGuest && (
-            <div className="space-y-2">
-              <Label htmlFor="company" className="text-sm font-medium">Assign to Company</Label>
-              <Select>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Select company" />
-                </SelectTrigger>
-                <SelectContent>
-                  {companies.map((company) => (
-                    <SelectItem key={company} value={company.toLowerCase()}>
-                      {company}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {/* ID Proof Upload */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Upload ID Proof</Label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-              <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-              <p className="text-sm text-gray-600">Click to upload or drag and drop</p>
-              <p className="text-xs text-gray-500 mt-1">PNG, JPG, PDF up to 10MB</p>
-              <input type="file" className="hidden" accept="image/*,application/pdf" />
-            </div>
-          </div>
-
-          {/* Payment Entry */}
-          <Card className="bg-gray-50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <CreditCard className="h-4 w-4" />
-                Payment Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="amount" className="text-sm font-medium">Amount</Label>
-                  <Input id="amount" placeholder="₹ 0.00" className="h-10" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="paymentMode" className="text-sm font-medium">Payment Mode</Label>
-                  <Select>
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select mode" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cash">Cash</SelectItem>
-                      <SelectItem value="card">Card</SelectItem>
-                      <SelectItem value="upi">UPI</SelectItem>
-                      <SelectItem value="bank">Bank Transfer</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="paymentStatus" className="text-sm font-medium">Status</Label>
-                  <Select>
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="paid">Paid</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="company">Company Billing</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            {/* Company Assignment */}
+            {guestTypes.companyGuest && (
+              <div className="space-y-2">
+                <Label htmlFor="company" className="text-sm font-medium">Assign to Company</Label>
+                <Select>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Select company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companies.map((company) => (
+                      <SelectItem key={company} value={company.toLowerCase()}>
+                        {company}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </CardContent>
-          </Card>
+            )}
+          </CardContent>
+        </Card>
 
-          {/* Submit Button */}
-          <div className="flex justify-end space-x-4 pt-4">
-            <Button type="button" variant="outline" className="px-6">
-              Cancel
-            </Button>
-            <Button type="submit" className="px-6 bg-blue-600 hover:bg-blue-700">
-              Complete Check-In
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        {/* Step 5: Payment Details */}
+        <Card className="bg-muted/30">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-primary flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Step 5: Payment Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="amount" className="text-sm font-medium">Amount</Label>
+                <Input id="amount" placeholder="₹ 0.00" className="h-10" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="paymentMode" className="text-sm font-medium">Payment Mode</Label>
+                <Select>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Select mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="card">Card</SelectItem>
+                    <SelectItem value="upi">UPI</SelectItem>
+                    <SelectItem value="bank">Bank Transfer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="paymentStatus" className="text-sm font-medium">Status</Label>
+                <Select>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="company">Company Billing</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Submit Actions */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex justify-end space-x-4">
+              <Button type="button" variant="outline" className="px-8 h-12 text-base">
+                Cancel
+              </Button>
+              <Button type="submit" className="px-8 h-12 text-base bg-green-600 hover:bg-green-700">
+                ✓ Complete Check-In
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    </div>
   );
 };
 
