@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,6 @@ import LiveRoomGrid from "@/components/LiveRoomGrid";
 import SmartBilling from "@/components/SmartBilling";
 import AuditLog from "@/components/AuditLog";
 import IdProofUpload from "@/components/IdProofUpload";
-import GuestList from "@/components/GuestList";
-import EnhancedCheckOutForm from "@/components/EnhancedCheckOutForm";
-import CompanyBilling from "@/components/CompanyBilling";
 import { Users, Calendar, Building2, CreditCard, TrendingUp, Search, Bell, Download, History, Settings, LogOut, Globe, Shield, Menu, X, Home, UserCheck, UserX } from "lucide-react";
 
 interface IndexProps {
@@ -61,13 +59,13 @@ const Index = ({ user, onLogout }: IndexProps) => {
     
     switch (user.role) {
       case "admin":
-        return [...baseTabs, "guest-list", "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "company-billing", "audit"];
+        return [...baseTabs, "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "audit"];
       case "bmo":
-        return [...baseTabs, "guest-list", "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "company-billing"];
+        return [...baseTabs, "room-mgmt", "payments", "guests", "reports", "search", "export", "billing", "audit"];
       case "fmo":
-        return [...baseTabs, "guest-list", "room-mgmt", "payments", "guests", "reports", "search", "billing"];
+        return [...baseTabs, "room-mgmt", "payments", "guests", "reports", "search", "billing"];
       case "front-office":
-        return [...baseTabs, "guest-list", "guests", "search"];
+        return [...baseTabs, "guests", "search", "billing"];
       default:
         return baseTabs;
     }
@@ -79,7 +77,6 @@ const Index = ({ user, onLogout }: IndexProps) => {
     { id: "dashboard", label: "Dashboard", icon: Home, color: "text-blue-600" },
     { id: "checkin", label: "Check In", icon: UserCheck, color: "text-green-600" },
     { id: "checkout", label: "Check Out", icon: UserX, color: "text-orange-600" },
-    { id: "guest-list", label: "Guest List", icon: Users, color: "text-purple-600" },
     { id: "rooms", label: "Rooms", icon: Building2, color: "text-purple-600" },
     { id: "live-rooms", label: "Live Grid", icon: Building2, color: "text-teal-600" },
     { id: "room-mgmt", label: "Room Management", icon: Settings, color: "text-indigo-600" },
@@ -89,7 +86,6 @@ const Index = ({ user, onLogout }: IndexProps) => {
     { id: "search", label: "Advanced Search", icon: Search, color: "text-violet-600" },
     { id: "export", label: "Data Export", icon: Download, color: "text-pink-600" },
     { id: "billing", label: "Smart Billing", icon: CreditCard, color: "text-yellow-600" },
-    { id: "company-billing", label: "Company Bills", icon: Building2, color: "text-blue-600" },
     { id: "audit", label: "Audit Log", icon: Shield, color: "text-red-600" }
   ];
 
@@ -97,6 +93,7 @@ const Index = ({ user, onLogout }: IndexProps) => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Top Bar - Front Office Optimized */}
       <div className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-4">
@@ -121,6 +118,7 @@ const Index = ({ user, onLogout }: IndexProps) => {
             </div>
           </div>
 
+          {/* Top Bar Navigation - Larger for Front Office */}
           <div className="hidden lg:flex items-center space-x-3">
             {visibleNavItems.slice(0, 5).map((item) => {
               const Icon = item.icon;
@@ -162,6 +160,7 @@ const Index = ({ user, onLogout }: IndexProps) => {
       </div>
 
       <div className="flex">
+        {/* Mobile Sidebar - Front Office Optimized */}
         <div className={`${sidebarCollapsed ? 'w-20' : 'w-80'} transition-all duration-300 bg-card border-r border-border shadow-lg h-[calc(100vh-81px)] overflow-y-auto lg:hidden animate-slide-in`}>
           <div className="p-6">
             <nav className="space-y-3">
@@ -186,9 +185,11 @@ const Index = ({ user, onLogout }: IndexProps) => {
           </div>
         </div>
 
+        {/* Main Content - Front Office Optimized */}
         <div className="flex-1 overflow-auto bg-accent/30">
           <div className="p-8">
             <div className="fo-card overflow-hidden animate-fade-in">
+              {/* Active Tab Header */}
               <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-6">
                 <div className="flex items-center gap-3">
                   {(() => {
@@ -204,6 +205,7 @@ const Index = ({ user, onLogout }: IndexProps) => {
                 </div>
               </div>
 
+              {/* Tab Contents */}
               <div className="bg-card">
                 {activeTab === "dashboard" && (
                   <div className="p-8">
@@ -222,17 +224,7 @@ const Index = ({ user, onLogout }: IndexProps) => {
 
                 {activeTab === "checkout" && (
                   <div className="p-8">
-                    <EnhancedCheckOutForm 
-                      userRole={user.role} 
-                      branch={user.branch} 
-                      isGSTBranch={isGSTBranch} 
-                    />
-                  </div>
-                )}
-
-                {activeTab === "guest-list" && (
-                  <div className="p-8">
-                    <GuestList userRole={user.role} />
+                    <CheckOutForm />
                   </div>
                 )}
 
@@ -289,15 +281,6 @@ const Index = ({ user, onLogout }: IndexProps) => {
                     <SmartBilling 
                       userRole={user.role} 
                       branch={user.branch} 
-                      isGSTBranch={isGSTBranch} 
-                    />
-                  </div>
-                )}
-
-                {activeTab === "company-billing" && (user.role === "admin" || user.role === "bmo") && (
-                  <div className="p-8">
-                    <CompanyBilling 
-                      userRole={user.role} 
                       isGSTBranch={isGSTBranch} 
                     />
                   </div>
